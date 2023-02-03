@@ -44,6 +44,9 @@ class EditorWindow:
         ttk.Button(self.menu_framing, text="Adjust Levels", command=self.levels_func).grid(
             row=7, column=0, columnspan=2, padx=2, pady=3, sticky='sw')
 
+        ttk.Button(self.menu_framing, text="Add Watermark", command=self.watermark_func).grid(
+            row=8, column=0, columnspan=2, padx=2, pady=3, sticky='sw')
+
         self.apply_cancel_footer = ttk.Frame(self.parent)
         self.apply_cancel_footer.pack()
 
@@ -62,6 +65,103 @@ class EditorWindow:
         self.side_frame = ttk.Frame(self.menu_framing)
         self.side_frame.grid(row=0, column=4, rowspan=10)
         self.side_frame.config(relief=GROOVE, padding=(50, 15))
+
+    def watermark_func(self):
+        self.refresh_addl_menu()
+        ttk.Button(
+            self.side_frame, text="Import Logo", command=self.import_watermark_func).grid(row=0, column=2,
+                                                                                  padx=5, pady=5,
+                                                                                  sticky='sw')
+        ttk.Button(
+            self.side_frame, text="Add Logo", command=self.add_watermark_menu).grid(row=1, column=2,
+                                                                                               padx=5, pady=5,
+                                                                                               sticky='sw')
+
+    def add_watermark_menu(self):
+        self.refresh_addl_menu()
+        ttk.Button(
+            self.side_frame, text="Top Left", command=self.add_watermark_tl).grid(row=1, column=2,
+                                                                                     padx=5, pady=5,
+                                                                                     sticky='sw')
+        ttk.Button(
+            self.side_frame, text="Top Right", command=self.add_watermark_tr).grid(row=1, column=3,
+                                                                                      padx=5, pady=5, sticky='sw')
+
+        ttk.Button(
+            self.side_frame, text="Bottom Left", command=self.add_watermark_bl).grid(row=2, column=2,
+                                                                                        padx=5, pady=5, sticky='sw')
+
+        ttk.Button(
+            self.side_frame, text="Bottom Right", command=self.add_watermark_br).grid(row=2, column=3,
+                                                                                         padx=5, pady=5, sticky='sw')
+
+    def import_watermark_func(self):
+        self.logo_filename = filedialog.askopenfilename()
+        self.logo_png = cv.imread(self.logo_filename, cv.IMREAD_UNCHANGED)
+        self.h_logo, self.w_logo, self._ = self.logo_png.shape
+
+        self.height, self.width, channels = self.edited_img.shape
+
+        if self.width >= self.height:
+            resize_w = self.width/10
+            resize_h = resize_w * (self.h_logo/self.w_logo)
+        else:
+            resize_w = self.width / 5
+            resize_h = resize_w * (self.h_logo / self.w_logo)
+
+        self.w_logo = resize_w
+        self.h_logo = resize_h
+        self.logo_png = cv.resize(self.logo_png, (int(resize_w), int(resize_h)))
+
+        self.top_y = int(self.height/2) - int(self.h_logo / 2)
+        self.bottom_y = self.top_y + self.h_logo
+        self.left_x = int(self.width/2) - int(self.w_logo / 2)
+        self.right_x = self.left_x + self.w_logo
+
+    def add_watermark_tl(self):
+        self.add_transparent_image(self.edited_img, self.logo_png, 50,50)
+        self.edited_img=self.filter_img
+        self.output_image(self.filter_img)
+
+    def add_watermark_tr(self):
+        self.add_transparent_image(self.edited_img, self.logo_png, int(self.width - self.w_logo - 50), 50)
+        self.edited_img = self.filter_img
+        self.output_image(self.filter_img)
+
+    def add_watermark_bl(self):
+        self.add_transparent_image(self.edited_img, self.logo_png, 50, int(self.height - self.h_logo - 50))
+        self.edited_img = self.filter_img
+        self.output_image(self.filter_img)
+
+    def add_watermark_br(self):
+        self.add_transparent_image(self.edited_img, self.logo_png, int(self.width - self.w_logo - 50),  int(self.height - self.h_logo - 50))
+        self.edited_img = self.filter_img
+        self.output_image(self.filter_img)
+
+    def add_transparent_image(self, background, foreground, x_offset, y_offset):
+        bg_h, bg_w, bg_channels = background.shape
+        fg_h, fg_w, fg_channels = foreground.shape
+
+        w = min(fg_w, bg_w, fg_w + x_offset, bg_w - x_offset)
+        h = min(fg_h, bg_h, fg_h + y_offset, bg_h - y_offset)
+
+        if w < 1 or h < 1: return
+
+        bg_x = max(0, x_offset)
+        bg_y = max(0, y_offset)
+        fg_x = max(0, x_offset * -1)
+        fg_y = max(0, y_offset * -1)
+        foreground = foreground[fg_y:fg_y + h, fg_x:fg_x + w]
+        background_subsection = background[bg_y:bg_y + h, bg_x:bg_x + w]
+
+        foreground_colors = foreground[:, :, :3]
+        alpha_channel = foreground[:, :, 3] / 255  # 0-255 => 0.0-1.0
+
+        alpha_mask = np.dstack((alpha_channel, alpha_channel, alpha_channel))
+
+        composite = background_subsection * (1 - alpha_mask) + foreground_colors * alpha_mask
+
+        background[bg_y:bg_y + h, bg_x:bg_x + w] = composite
 
     def import_func(self):
         self.canvas.delete("all")
