@@ -44,7 +44,7 @@ class EditorWindow:
         ttk.Button(self.menu_framing, text="Adjust Levels", command=self.levels_func).grid(
             row=7, column=0, columnspan=2, padx=2, pady=3, sticky='sw')
 
-        ttk.Button(self.menu_framing, text="Add Watermark", command=self.watermark_func).grid(
+        ttk.Button(self.menu_framing, text="Add Logo", command=self.watermark_func).grid(
             row=8, column=0, columnspan=2, padx=2, pady=3, sticky='sw')
 
         self.apply_cancel_footer = ttk.Frame(self.parent)
