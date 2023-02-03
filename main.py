@@ -257,7 +257,12 @@ class EditorWindow:
 
 
     def save_func(self):
-        pass
+        orig_file_type = self.filename.split('.')[-1]
+        savefilename = filedialog.asksaveasfilename()
+        savefilename = savefilename + "." + orig_file_type
+        save_as_img = self.edited_img
+        cv.imwrite(savefilename, save_as_img)
+        self.filename = savefilename
 
     def flip_func(self):
         pass
@@ -435,18 +440,3 @@ class EditorWindow:
 mainWindow = Tk()
 EditorWindow(mainWindow)
 mainWindow.mainloop()
-
-
-# def resizeMedia(frame, scale=0.75):
-#     width = int(frame.shape[1] * scale)
-#     height = int(frame.shape[0] * scale)
-#     dimensions = (width, height)
-#     return cv.resize(frame, dimensions, interpolation=cv.INTER_AREA)
-#
-#
-# img = cv.imread('images/IMG_5779.jpg')
-# img_resized = resizeMedia(img, 0.5)
-#
-# cv.imshow('Photo resized', img_resized)
-#
-# cv.waitKey(0)
