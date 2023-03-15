@@ -264,11 +264,6 @@ class EditorWindow:
         cv.imwrite(savefilename, save_as_img)
         self.filename = savefilename
 
-    def flip_func(self):
-        pass
-
-    def rgb_hack(rgb):
-        return "#%02x%02x%02x" % rgb
 
     def draw_func(self):
         self.color_hex = ((0,0,0), '#000000')
@@ -377,7 +372,40 @@ class EditorWindow:
 
 
     def levels_func(self):
-        pass
+        self.refresh_addl_menu()
+        ttk.Label(
+            self.side_frame, text="Highlights").grid(row=0, column=2, padx=5, sticky='sw')
+
+        self.highlights_slider = Scale(self.side_frame, from_=0, to=100, orient=tkinter.HORIZONTAL,
+                                           command=self.highlights_func)
+        self.highlights_slider.grid(row=1, column=2, padx=5, sticky='sw')
+
+        ttk.Label(
+            self.side_frame, text="Midtones").grid(row=2, column=2, padx=5, sticky='sw')
+
+        self.midtones_slider = Scale(self.side_frame, from_=0, to=100, orient=tkinter.HORIZONTAL,
+                                          command=self.midtones_func)
+        self.midtones_slider.grid(row=3, column=2, padx=5, sticky='sw')
+
+        ttk.Label(
+            self.side_frame, text="Shadows").grid(row=4, column=2, padx=5, sticky='sw')
+
+        self.midtones_slider = Scale(self.side_frame, from_=0, to=100, orient=tkinter.HORIZONTAL,
+                                        command=self.shadows_func)
+        self.midtones_slider.grid(row=5, column=2, padx=5, sticky='sw')
+
+    def highlights_func(self, pct):
+        pct = int(float(pct)*256/100)
+
+
+    def midtones_func(self, pct):
+        pct = int(float(pct)*256/100)
+
+
+    def shadows_func(self, pct):
+        pct = int(float(pct)*256/100)
+
+
 
     def apply_func(self):
         self.edited_img=self.filter_img
