@@ -398,12 +398,6 @@ class EditorWindow:
         self.filter_img = cv.convertScaleAbs(self.edited_img, alpha=1, beta=self.saturation_slider.get())
         self.output_image(self.filter_img)
 
-
-    def shadows_func(self, pct):
-        pct = int(float(pct)*256/100)
-
-
-
     def apply_func(self):
         self.edited_img=self.filter_img
         self.output_image(self.edited_img)
