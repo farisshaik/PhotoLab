@@ -1,0 +1,18 @@
+# Ignore virtual environments
+myenv/
+pyvenv.cfg
+
+# Ignore compiled Python files
+__pycache__/
+*.py[cod]
+
+# Ignore images if you don’t need to version them
+*.jpg
+*.png
+
+# Ignore OS-generated files
+.DS_Store
+
+# Ignore IDE/editor specific files
+.idea/
+.vscode/
