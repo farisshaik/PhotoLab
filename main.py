@@ -1,10 +1,12 @@
 import tkinter
-from tkinter import ttk, Tk, PhotoImage, RIDGE, Canvas, GROOVE, filedialog, colorchooser
+from tkinter import ttk, Tk, PhotoImage, RIDGE, Canvas, GROOVE, filedialog, colorchooser, messagebox
 from tkinter.ttk import Scale
 
 from PIL import ImageTk, Image
 import cv2 as cv
 import numpy as np
+
+import sv_ttk
 
 class EditorWindow:
     def __init__(self, parent):
@@ -13,8 +15,8 @@ class EditorWindow:
         self.frame_header = ttk.Frame(self.parent)
         self.frame_header.pack()
 
-        ttk.Label(self.frame_header, text='Image Editor').grid(row=0, column=1, columnspan=2)
-        ttk.Label(self.frame_header, text='Faris Shaik').grid(row=1, column=1, columnspan=2)
+        ttk.Label(self.frame_header, text='PhotoLab').grid(row=0, column=1, columnspan=2)
+        ttk.Label(self.frame_header, text='OpenCV Image Editor').grid(row=1, column=1, columnspan=2)
 
         self.menu_framing = ttk.Frame(self.parent)
         self.menu_framing.pack()
@@ -165,11 +167,20 @@ class EditorWindow:
 
     def import_func(self):
         self.canvas.delete("all")
-        self.filename = filedialog.askopenfilename()
-        self.input_img = cv.imread(self.filename)
-        self.edited_img = cv.imread(self.filename)
-        self.filter_img = cv.imread(self.filename)
-        self.output_image(self.edited_img)
+        try:
+            self.filename = filedialog.askopenfilename()
+            if not self.filename:
+                return
+            self.input_img = cv.imread(self.filename)
+            if self.input_img is None:
+                messagebox.showerror("Error", "Failed to load image. Ensure file is an image file")
+                return
+            self.edited_img = cv.imread(self.filename)
+            self.filter_img = cv.imread(self.filename)
+            self.output_image(self.edited_img)
+        except Exception as e:
+            messagebox.showerror("Error", "An error occured: {e}")
+
 
     def rotate_flip_func(self):
         self.refresh_addl_menu()
@@ -455,7 +466,7 @@ class EditorWindow:
         self.canvas.create_image(
             new_width / 2, new_height / 2, image=self.new_img)
 
-
 mainWindow = Tk()
 EditorWindow(mainWindow)
+sv_ttk.set_theme("light")
 mainWindow.mainloop()
